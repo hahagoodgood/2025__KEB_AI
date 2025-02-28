@@ -1,15 +1,28 @@
-import numpy as np
-import pandas as pd
-# from sklearn.impute import SimpleImputer
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsRegressor 
+from sklearn.model_selection import train_test_split 
 
-df = pd.DataFrame(
-    {
-        'A':[1, 2, np.nan, 4],
-        'B':[np.nan, 12, 3, 4],
-        'C':[1, 2, 3, 4]
-    }
-)
-print(df)
 
-df[['A', 'B']] = df[['A', 'B']].fillna(df[['A', 'B']].mean())
-print(df)
+titanic = sns.load_dataset('titanic') 
+median_age = titanic['age'].median()  
+titanic_fill_row = titanic.fillna({'age' : median_age}) 
+
+X = titanic_fill_row[['age']]  
+y = titanic_fill_row[['survived']] 
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = KNeighborsRegressor(n_neighbors=5)
+
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+plt.figure(figsize=(5, 2))
+plt.scatter(X_test, y_test, color='blue', label='Real')
+plt.scatter(X_test, y_pred, color='red', label='Predicted')
+plt.title('KNeighborsRegressor: Real vs Predicted')
+plt.xlabel('Age')
+plt.ylabel('Survivied')
+plt.show()
